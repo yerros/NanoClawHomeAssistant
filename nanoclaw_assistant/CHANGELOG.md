@@ -2,7 +2,7 @@
 
 All notable changes to the NanoClaw Assistant Home Assistant add-on will be documented in this file.
 
-## [0.1.1] - 2026-04-27
+## [0.1.2] - 2026-04-27
 
 ### Added
 - Initial experimental NanoClaw Home Assistant add-on scaffold.
@@ -12,6 +12,7 @@ All notable changes to the NanoClaw Assistant Home Assistant add-on will be docu
 - Automatic dependency install and build attempt on first boot.
 - Dual CLI support in the add-on image: `Claude Code` and `Codex`.
 - New add-on option `ai_cli_provider` to declare the preferred coding CLI in the runtime and UI.
+- Bundled NanoClaw source in the add-on image for automatic first-boot checkout without requiring a manual terminal clone.
 
 ### Notes
 - This add-on is experimental and terminal-first.

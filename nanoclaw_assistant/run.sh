@@ -39,6 +39,7 @@ fi
 
 NANOCLAW_ROOT="/config/nanoclaw"
 APP_DIR="$NANOCLAW_ROOT/app"
+BUNDLE_DIR="/opt/nanoclaw-bundle"
 LOG_DIR="$NANOCLAW_ROOT/logs"
 LOG_FILE="$LOG_DIR/nanoclaw.log"
 BOOTSTRAP_LOG="$LOG_DIR/bootstrap.log"
@@ -135,6 +136,16 @@ start_internal_docker() {
 REPO_STATUS="not bootstrapped"
 SETUP_HINT="bash nanoclaw.sh"
 BUILD_READY="false"
+BUNDLED_REPO_URL=""
+BUNDLED_REPO_REF=""
+
+if [ -f "${BUNDLE_DIR}/.bundled-repo-url" ]; then
+  BUNDLED_REPO_URL="$(cat "${BUNDLE_DIR}/.bundled-repo-url" 2>/dev/null || true)"
+fi
+
+if [ -f "${BUNDLE_DIR}/.bundled-ref" ]; then
+  BUNDLED_REPO_REF="$(cat "${BUNDLE_DIR}/.bundled-ref" 2>/dev/null || true)"
+fi
 
 case "$AI_CLI_PROVIDER" in
   claude|codex|both) ;;
@@ -147,13 +158,26 @@ esac
 
 if [ ! -d "$APP_DIR/.git" ]; then
   if [ "$BOOTSTRAP_REPOSITORY" = "true" ] || [ "$BOOTSTRAP_REPOSITORY" = "1" ]; then
-    echo "INFO: Cloning NanoClaw repository into $APP_DIR ..."
+    echo "INFO: Preparing NanoClaw repository in $APP_DIR ..."
     rm -rf "$APP_DIR"
-    if git clone --branch "$NANOCLAW_REPO_REF" --single-branch "$NANOCLAW_REPO_URL" "$APP_DIR" >>"$BOOTSTRAP_LOG" 2>&1; then
-      REPO_STATUS="cloned from $NANOCLAW_REPO_REF"
-    else
-      REPO_STATUS="clone failed, see bootstrap.log"
-      SETUP_HINT="git clone $NANOCLAW_REPO_URL $APP_DIR"
+
+    if [ -d "$BUNDLE_DIR/.git" ] && [ "$NANOCLAW_REPO_URL" = "$BUNDLED_REPO_URL" ] && [ "$NANOCLAW_REPO_REF" = "$BUNDLED_REPO_REF" ]; then
+      echo "INFO: Copying bundled NanoClaw source from image" >>"$BOOTSTRAP_LOG"
+      if rsync -a "$BUNDLE_DIR/" "$APP_DIR/" >>"$BOOTSTRAP_LOG" 2>&1; then
+        REPO_STATUS="bundled source copied (${NANOCLAW_REPO_REF})"
+      else
+        REPO_STATUS="bundle copy failed, see bootstrap.log"
+      fi
+    fi
+
+    if [ "$REPO_STATUS" = "not bootstrapped" ] || [ "$REPO_STATUS" = "bundle copy failed, see bootstrap.log" ]; then
+      echo "INFO: Falling back to git clone for NanoClaw source" >>"$BOOTSTRAP_LOG"
+      if git clone --branch "$NANOCLAW_REPO_REF" --single-branch "$NANOCLAW_REPO_URL" "$APP_DIR" >>"$BOOTSTRAP_LOG" 2>&1; then
+        REPO_STATUS="cloned from $NANOCLAW_REPO_REF"
+      else
+        REPO_STATUS="clone failed, see bootstrap.log"
+        SETUP_HINT="git clone $NANOCLAW_REPO_URL $APP_DIR"
+      fi
     fi
   else
     REPO_STATUS="bootstrap disabled"
@@ -217,6 +241,21 @@ if [ -d "$APP_DIR" ] && [ -f "$APP_DIR/package.json" ]; then
   elif [ -f "$APP_DIR/package.json" ]; then
     SETUP_HINT="pnpm setup"
   fi
+
+  case "$AI_CLI_PROVIDER" in
+    claude)
+      SETUP_HINT="${SETUP_HINT}
+claude"
+      ;;
+    codex)
+      SETUP_HINT="${SETUP_HINT}
+codex --login"
+      ;;
+    both)
+      SETUP_HINT="${SETUP_HINT}
+claude   # or: codex --login"
+      ;;
+  esac
 
   if [ -f "$APP_DIR/dist/index.js" ]; then
     BUILD_READY="true"

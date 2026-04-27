@@ -7,7 +7,8 @@ It wraps upstream NanoClaw in a Home Assistant friendly package, but the workflo
 ## Overview
 
 What the add-on does:
-- clones NanoClaw into persistent storage at `/config/nanoclaw/app`
+- bundles NanoClaw source into the image for automatic first-boot checkout
+- prepares NanoClaw in persistent storage at `/config/nanoclaw/app`
 - installs `pnpm`, `Claude Code`, and `Codex`
 - starts an internal Docker daemon for NanoClaw agent containers
 - exposes an Ingress page with a browser terminal
@@ -16,6 +17,7 @@ What the add-on does:
 What the add-on does not do:
 - replace upstream NanoClaw onboarding with a polished Home Assistant wizard
 - remove the need for Docker or a supported coding CLI
+- avoid interactive CLI login
 - make Raspberry Pi 3 fast
 
 ## Upstream references
@@ -55,6 +57,8 @@ On startup, the add-on tries to:
 4. start NanoClaw with `pnpm start`
 
 If any of those steps fail, the add-on should still keep the Ingress page and terminal available so you can finish setup manually.
+
+When the configured repository URL and ref match the bundled upstream snapshot, the add-on copies source from the image into `/config/nanoclaw/app` instead of relying on a live `git clone` during first boot.
 
 Useful paths:
 - checkout: `/config/nanoclaw/app`
@@ -103,6 +107,11 @@ codex --login
 
 Then complete the login flow shown in the terminal.
 
+Important:
+- source checkout, dependency install, and build are automated by the add-on
+- CLI authentication is still interactive
+- if upstream NanoClaw expects a skill like `/setup` inside the CLI, you still need to run that manually after login
+
 ## Configuration reference
 
 `timezone`
@@ -123,7 +132,9 @@ Then complete the login flow shown in the terminal.
 - Controls the preferred CLI shown in the UI and the runtime environment.
 
 `bootstrap_repository`
-- Clones NanoClaw automatically into persistent storage if no checkout exists yet.
+- Automatically prepares NanoClaw in persistent storage if no checkout exists yet.
+- Uses the bundled source from the image when the configured repo URL and ref match the bundled upstream snapshot.
+- Falls back to live `git clone` when a custom repo URL or ref is configured.
 
 `nanoclaw_repo_url`
 - Git URL used for the persistent checkout.

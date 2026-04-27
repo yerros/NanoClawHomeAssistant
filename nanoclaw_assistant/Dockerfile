@@ -1,6 +1,9 @@
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
+ARG NANOCLAW_REPO_URL=https://github.com/qwibitai/nanoclaw.git
+ARG NANOCLAW_REF=main
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
     ca-certificates \
@@ -46,6 +49,11 @@ RUN ARCH=$(echo ${TARGETARCH:-$(dpkg --print-architecture)} | sed 's|arm64|aarch
 RUN npm config set fund false \
     && npm config set audit false \
     && npm install -g pnpm @anthropic-ai/claude-code @openai/codex
+
+RUN git clone --branch "${NANOCLAW_REF}" --single-branch "${NANOCLAW_REPO_URL}" /opt/nanoclaw-bundle \
+    && git -C /opt/nanoclaw-bundle rev-parse HEAD > /opt/nanoclaw-bundle/.bundled-commit \
+    && printf '%s\n' "${NANOCLAW_REPO_URL}" > /opt/nanoclaw-bundle/.bundled-repo-url \
+    && printf '%s\n' "${NANOCLAW_REF}" > /opt/nanoclaw-bundle/.bundled-ref
 
 COPY run.sh /run.sh
 COPY render_landing.py /render_landing.py

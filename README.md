@@ -7,12 +7,13 @@ Experimental Home Assistant add-on for running **NanoClaw** on **Home Assistant 
 This repository is experimental and terminal-first.
 
 It is meant for users who want to test NanoClaw inside Home Assistant with:
+- NanoClaw source bundled into the image so first boot does not require a manual clone
 - a persistent NanoClaw checkout under `/config/nanoclaw/app`
 - an embedded browser terminal
 - both `Claude Code` and `Codex` installed in the add-on
 - an internal Docker daemon for NanoClaw agent containers
 
-It is not yet a polished one-click NanoClaw port.
+It is not yet a fully unattended one-click NanoClaw port because CLI login still requires an interactive terminal session.
 
 ## What is in this repository
 

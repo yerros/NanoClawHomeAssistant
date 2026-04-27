@@ -1,5 +1,5 @@
 name: NanoClaw Assistant
-version: "0.1.1"
+version: "0.1.2"
 slug: nanoclaw_assistant
 description: Experimental Home Assistant add-on wrapper for NanoClaw with internal Docker runtime.
 url: https://github.com/yerros/NanoClawHomeAssistant

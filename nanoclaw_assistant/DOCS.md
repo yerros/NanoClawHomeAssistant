@@ -4,7 +4,8 @@
 
 ## What it does
 
-- clones NanoClaw into `/config/nanoclaw/app`
+- prepares NanoClaw source automatically from the bundled image snapshot or a configured repo clone
+- creates the persistent NanoClaw checkout at `/config/nanoclaw/app`
 - installs `pnpm`, `Claude Code`, and `Codex`
 - starts an internal Docker daemon for NanoClaw agent containers
 - exposes a browser terminal in the add-on page
@@ -43,6 +44,8 @@ or
 ```sh
 codex --login
 ```
+
+Source checkout is automatic. You only need the terminal for CLI authentication and any upstream interactive setup flow.
 
 ## Logs
 
