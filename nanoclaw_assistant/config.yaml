@@ -1,5 +1,5 @@
 name: NanoClaw Assistant
-version: "0.1.0"
+version: "0.1.1"
 slug: nanoclaw_assistant
 description: Experimental Home Assistant add-on wrapper for NanoClaw with internal Docker runtime.
 url: https://github.com/yerros/NanoClawHomeAssistant
@@ -30,6 +30,7 @@ options:
   enable_terminal: true
   terminal_port: 7682
   assistant_name: "Andy"
+  ai_cli_provider: "both"
   bootstrap_repository: true
   nanoclaw_repo_url: "https://github.com/qwibitai/nanoclaw.git"
   nanoclaw_repo_ref: "main"
@@ -43,6 +44,7 @@ schema:
   enable_terminal: bool?
   terminal_port: int(1024,65535)?
   assistant_name: str?
+  ai_cli_provider: list(claude|codex|both)?
   bootstrap_repository: bool?
   nanoclaw_repo_url: str?
   nanoclaw_repo_ref: str?

@@ -11,6 +11,7 @@ TZNAME=$(jq -r '.timezone // "UTC"' "$OPTIONS_FILE")
 ENABLE_TERMINAL=$(jq -r '.enable_terminal // true' "$OPTIONS_FILE")
 TERMINAL_PORT_RAW=$(jq -r '.terminal_port // 7682' "$OPTIONS_FILE")
 ASSISTANT_NAME=$(jq -r '.assistant_name // "Andy"' "$OPTIONS_FILE")
+AI_CLI_PROVIDER=$(jq -r '.ai_cli_provider // "both"' "$OPTIONS_FILE")
 BOOTSTRAP_REPOSITORY=$(jq -r '.bootstrap_repository // true' "$OPTIONS_FILE")
 NANOCLAW_REPO_URL=$(jq -r '.nanoclaw_repo_url // "https://github.com/qwibitai/nanoclaw.git"' "$OPTIONS_FILE")
 NANOCLAW_REPO_REF=$(jq -r '.nanoclaw_repo_ref // "main"' "$OPTIONS_FILE")
@@ -31,6 +32,7 @@ export TZ="$TZNAME"
 export HOME="/config"
 export ASSISTANT_NAME
 export MAX_CONCURRENT_CONTAINERS
+export AI_CLI_PROVIDER
 if [ -n "$ONECLI_URL" ]; then
   export ONECLI_URL
 fi
@@ -134,6 +136,15 @@ REPO_STATUS="not bootstrapped"
 SETUP_HINT="bash nanoclaw.sh"
 BUILD_READY="false"
 
+case "$AI_CLI_PROVIDER" in
+  claude|codex|both) ;;
+  *)
+    echo "WARN: Invalid ai_cli_provider '$AI_CLI_PROVIDER'. Falling back to 'both'."
+    AI_CLI_PROVIDER="both"
+    export AI_CLI_PROVIDER
+    ;;
+esac
+
 if [ ! -d "$APP_DIR/.git" ]; then
   if [ "$BOOTSTRAP_REPOSITORY" = "true" ] || [ "$BOOTSTRAP_REPOSITORY" = "1" ]; then
     echo "INFO: Cloning NanoClaw repository into $APP_DIR ..."
@@ -164,6 +175,24 @@ CLAUDE_STATUS="not installed"
 if command -v claude >/dev/null 2>&1; then
   CLAUDE_STATUS="installed"
 fi
+
+CODEX_STATUS="not installed"
+if command -v codex >/dev/null 2>&1; then
+  CODEX_STATUS="installed"
+fi
+
+CLI_STATUS_DETAIL="provider=${AI_CLI_PROVIDER}"
+case "$AI_CLI_PROVIDER" in
+  claude)
+    CLI_STATUS_DETAIL="${CLI_STATUS_DETAIL}; login with: claude"
+    ;;
+  codex)
+    CLI_STATUS_DETAIL="${CLI_STATUS_DETAIL}; login with: codex --login"
+    ;;
+  both)
+    CLI_STATUS_DETAIL="${CLI_STATUS_DETAIL}; login with: claude or codex --login"
+    ;;
+esac
 
 RUNTIME_STATUS="manual setup required"
 if [ -d "$APP_DIR" ] && [ -f "$APP_DIR/package.json" ]; then
@@ -214,6 +243,8 @@ export TERMINAL_PORT
 export REPO_STATUS
 export DOCKER_STATUS
 export CLAUDE_STATUS
+export CODEX_STATUS
+export CLI_STATUS_DETAIL
 export RUNTIME_STATUS
 export SETUP_HINT
 export APP_DIR

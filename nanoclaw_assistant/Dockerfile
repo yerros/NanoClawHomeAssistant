@@ -45,7 +45,7 @@ RUN ARCH=$(echo ${TARGETARCH:-$(dpkg --print-architecture)} | sed 's|arm64|aarch
 
 RUN npm config set fund false \
     && npm config set audit false \
-    && npm install -g pnpm @anthropic-ai/claude-code
+    && npm install -g pnpm @anthropic-ai/claude-code @openai/codex
 
 COPY run.sh /run.sh
 COPY render_landing.py /render_landing.py

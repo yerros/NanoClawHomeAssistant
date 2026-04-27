@@ -35,11 +35,12 @@
       <div class="item"><b>Repository</b><br>__REPO_STATUS__</div>
       <div class="item"><b>Docker access</b><br>__DOCKER_STATUS__</div>
       <div class="item"><b>Claude Code</b><br>__CLAUDE_STATUS__</div>
+      <div class="item"><b>Codex</b><br>__CODEX_STATUS__</div>
       <div class="item"><b>Runtime</b><br>__RUNTIME_STATUS__</div>
     </div>
 
     <div class="note">
-      NanoClaw upstream expects Docker and Claude Code. In this add-on, first-time setup is still done from the terminal.
+      This add-on installs both Claude Code and Codex. Preferred CLI: __CLI_STATUS_DETAIL__. First-time setup is still done from the terminal.
     </div>
 
     <h3>First boot</h3>
@@ -55,6 +56,7 @@ Docker:    __DOCKER_LOG__</code></pre>
     <h3>Important limitations</h3>
     <ul>
       <li>This wrapper does not replace NanoClaw's upstream setup flow.</li>
+      <li>Upstream NanoClaw may still assume one coding CLI in some workflows; this add-on only ensures both CLIs are available in the runtime.</li>
       <li>This add-on runs an internal Docker daemon and therefore needs elevated add-on privileges.</li>
       <li>Pi 3 performance will be limited, especially during <code>pnpm install</code>, first build, and agent container startup.</li>
     </ul>

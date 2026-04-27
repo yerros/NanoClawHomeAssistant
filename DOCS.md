@@ -8,20 +8,22 @@ It wraps upstream NanoClaw in a Home Assistant friendly package, but the workflo
 
 What the add-on does:
 - clones NanoClaw into persistent storage at `/config/nanoclaw/app`
-- installs `pnpm` and `Claude Code`
+- installs `pnpm`, `Claude Code`, and `Codex`
 - starts an internal Docker daemon for NanoClaw agent containers
 - exposes an Ingress page with a browser terminal
 - attempts `pnpm install`, `pnpm build`, and `pnpm start` automatically
 
 What the add-on does not do:
 - replace upstream NanoClaw onboarding with a polished Home Assistant wizard
-- remove the need for Docker or Claude Code
+- remove the need for Docker or a supported coding CLI
 - make Raspberry Pi 3 fast
 
 ## Upstream references
 
 - NanoClaw: `https://github.com/qwibitai/nanoclaw`
 - Claude Code docs: `https://docs.anthropic.com/en/docs/claude-code/getting-started`
+- Codex CLI docs: `https://help.openai.com/en/articles/11096431-openai-codex-ci-getting-started`
+- Codex ChatGPT sign-in docs: `https://help.openai.com/en/articles/11381614`
 
 ## Installation
 
@@ -40,6 +42,7 @@ What the add-on does not do:
 - `auto_start_nanoclaw: true`
 - `enable_terminal: true`
 - `assistant_name: Andy`
+- `ai_cli_provider: both`
 - `max_concurrent_containers: 1` on Raspberry Pi 3
 
 ## First boot flow
@@ -78,14 +81,24 @@ pnpm setup
 pnpm start
 ```
 
-## Claude Code authentication
+## CLI authentication
 
-NanoClaw depends on Claude Code for its normal workflows. The add-on installs the `claude` CLI, but you still need to authenticate it from the terminal.
+The add-on installs both supported coding CLIs:
+- `claude`
+- `codex`
 
-Typical flow:
+Choose the one you want to authenticate and use.
+
+Claude Code:
 
 ```sh
 claude
+```
+
+Codex:
+
+```sh
+codex --login
 ```
 
 Then complete the login flow shown in the terminal.
@@ -103,6 +116,11 @@ Then complete the login flow shown in the terminal.
 
 `assistant_name`
 - Exported as `ASSISTANT_NAME`.
+
+`ai_cli_provider`
+- Exported as `AI_CLI_PROVIDER`.
+- Allowed values: `claude`, `codex`, `both`.
+- Controls the preferred CLI shown in the UI and the runtime environment.
 
 `bootstrap_repository`
 - Clones NanoClaw automatically into persistent storage if no checkout exists yet.
@@ -135,6 +153,12 @@ Instead, the add-on uses:
 - an internal `dockerd`
 
 This is the largest operational and security tradeoff in the project. Read [SECURITY.md](SECURITY.md) before deploying it on a trusted Home Assistant instance.
+
+## CLI compatibility note
+
+This repository now supports both `Claude Code` and `Codex` at the add-on level, meaning both CLIs are installed and available in the terminal/runtime.
+
+That does **not** guarantee that upstream NanoClaw already treats both CLIs as interchangeable in every workflow. If upstream NanoClaw still hardcodes one CLI in its scripts or prompts, you may need to patch the checkout under `/config/nanoclaw/app` or maintain a fork.
 
 ## Raspberry Pi 3 guidance
 
@@ -180,4 +204,12 @@ Authenticate Claude Code first:
 
 ```sh
 claude
+```
+
+### Codex setup does not complete
+
+Authenticate Codex first:
+
+```sh
+codex --login
 ```

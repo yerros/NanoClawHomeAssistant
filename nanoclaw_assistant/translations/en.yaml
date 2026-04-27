@@ -11,6 +11,13 @@ configuration:
   assistant_name:
     name: Assistant Name
     description: Exported as ASSISTANT_NAME for NanoClaw.
+  ai_cli_provider:
+    name: AI CLI Provider
+    description: Preferred coding CLI for this add-on. Both CLIs are installed; this setting controls the preferred runtime and UI hint.
+    options:
+      claude: "Claude Code only"
+      codex: "Codex only"
+      both: "Both installed"
   bootstrap_repository:
     name: Bootstrap Repository
     description: Clone NanoClaw into persistent storage automatically on first start.

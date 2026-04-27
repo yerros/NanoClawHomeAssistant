@@ -14,6 +14,8 @@ def main():
         "__REPO_STATUS__": os.environ.get("REPO_STATUS", "unknown"),
         "__DOCKER_STATUS__": os.environ.get("DOCKER_STATUS", "unknown"),
         "__CLAUDE_STATUS__": os.environ.get("CLAUDE_STATUS", "unknown"),
+        "__CODEX_STATUS__": os.environ.get("CODEX_STATUS", "unknown"),
+        "__CLI_STATUS_DETAIL__": os.environ.get("CLI_STATUS_DETAIL", "provider=both"),
         "__RUNTIME_STATUS__": os.environ.get("RUNTIME_STATUS", "manual setup required"),
         "__SETUP_HINT__": os.environ.get("SETUP_HINT", "Open the terminal and run bash nanoclaw.sh"),
         "__APP_DIR__": os.environ.get("APP_DIR", "/config/nanoclaw/app"),

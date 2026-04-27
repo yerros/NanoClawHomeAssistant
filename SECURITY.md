@@ -44,13 +44,13 @@ Mitigation:
 - keep `max_concurrent_containers` low, especially on Raspberry Pi 3
 - do not treat this add-on as isolated from the rest of your trusted environment
 
-### 3. Claude Code authentication and credentials
+### 3. Coding CLI authentication and credentials
 
-The add-on installs `Claude Code`, and you authenticate it interactively from the terminal.
+The add-on installs both `Claude Code` and `Codex`, and you authenticate the CLI you want to use from the terminal.
 
 Risk:
 - credentials or session data stored in the add-on runtime could be exposed if the add-on is compromised
-- any code path that can act as your authenticated NanoClaw/Claude session should be treated as sensitive
+- any code path that can act as your authenticated NanoClaw/CLI session should be treated as sensitive
 
 Mitigation:
 - only authenticate in an environment you trust

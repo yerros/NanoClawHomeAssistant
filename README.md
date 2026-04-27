@@ -9,7 +9,7 @@ This repository is experimental and terminal-first.
 It is meant for users who want to test NanoClaw inside Home Assistant with:
 - a persistent NanoClaw checkout under `/config/nanoclaw/app`
 - an embedded browser terminal
-- `Claude Code` installed in the add-on
+- both `Claude Code` and `Codex` installed in the add-on
 - an internal Docker daemon for NanoClaw agent containers
 
 It is not yet a polished one-click NanoClaw port.
@@ -39,3 +39,4 @@ It is not yet a polished one-click NanoClaw port.
 
 - NanoClaw: `https://github.com/qwibitai/nanoclaw`
 - Claude Code docs: `https://docs.anthropic.com/en/docs/claude-code/getting-started`
+- Codex CLI docs: `https://help.openai.com/en/articles/11096431-openai-codex-ci-getting-started`

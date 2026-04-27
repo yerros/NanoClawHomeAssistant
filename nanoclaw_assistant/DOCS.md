@@ -5,7 +5,7 @@
 ## What it does
 
 - clones NanoClaw into `/config/nanoclaw/app`
-- installs `pnpm` and `Claude Code`
+- installs `pnpm`, `Claude Code`, and `Codex`
 - starts an internal Docker daemon for NanoClaw agent containers
 - exposes a browser terminal in the add-on page
 - attempts to install dependencies, build, and start NanoClaw automatically
@@ -32,6 +32,18 @@ pnpm setup
 pnpm start
 ```
 
+To authenticate a coding CLI:
+
+```sh
+claude
+```
+
+or
+
+```sh
+codex --login
+```
+
 ## Logs
 
 - Runtime: `/config/nanoclaw/logs/nanoclaw.log`
@@ -40,7 +52,7 @@ pnpm start
 
 ## Important note
 
-This add-on requires elevated privileges because NanoClaw needs write access to a Docker daemon in order to create agent containers. Home Assistant's documented `docker_api` capability is read-only, so this add-on runs its own internal Docker daemon instead.
+This add-on requires elevated privileges because NanoClaw needs write access to a Docker daemon in order to create agent containers. Home Assistant's documented `docker_api` capability is read-only, so this add-on runs its own internal Docker daemon instead. The add-on also installs both `claude` and `codex`, but upstream NanoClaw may still assume one CLI in some workflows.
 
 Read [../SECURITY.md](../SECURITY.md) before deploying it on a trusted Home Assistant instance.
 
