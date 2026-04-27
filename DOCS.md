@@ -1,48 +1,38 @@
-# NanoClaw Assistant — Experimental Home Assistant Add-on
+# NanoClaw Assistant Documentation
 
-This repository ships the `nanoclaw_assistant` add-on for Home Assistant OS.
+This repository ships one Home Assistant add-on: `nanoclaw_assistant`.
 
-## Status
+It wraps upstream NanoClaw in a Home Assistant friendly package, but the workflow is still terminal-first and experimental.
 
-`nanoclaw_assistant` is experimental. It is not a polished NanoClaw port yet.
+## Overview
 
-What it does today:
-- packages NanoClaw as a Home Assistant add-on shell
-- provides Ingress UI and a browser terminal
-- clones a persistent NanoClaw checkout into `/config/nanoclaw/app`
+What the add-on does:
+- clones NanoClaw into persistent storage at `/config/nanoclaw/app`
 - installs `pnpm` and `Claude Code`
-- starts an internal Docker daemon inside the add-on
+- starts an internal Docker daemon for NanoClaw agent containers
+- exposes an Ingress page with a browser terminal
 - attempts `pnpm install`, `pnpm build`, and `pnpm start` automatically
 
-What it does not do:
-- replace the upstream NanoClaw onboarding flow
-- hide Docker or Claude Code requirements
-- guarantee good performance on Raspberry Pi 3
+What the add-on does not do:
+- replace upstream NanoClaw onboarding with a polished Home Assistant wizard
+- remove the need for Docker or Claude Code
+- make Raspberry Pi 3 fast
 
-## Why it is different from OpenClaw Assistant
+## Upstream references
 
-OpenClaw can be wrapped as a more self-contained runtime.
-
-NanoClaw upstream is different:
-- it expects a persistent git checkout
-- it expects `Claude Code`
-- it expects Docker so it can spawn its own agent containers
-
-Upstream references:
-- NanoClaw repo: https://github.com/qwibitai/nanoclaw
-- Claude Code setup docs: https://docs.anthropic.com/en/docs/claude-code/getting-started
+- NanoClaw: `https://github.com/qwibitai/nanoclaw`
+- Claude Code docs: `https://docs.anthropic.com/en/docs/claude-code/getting-started`
 
 ## Installation
 
 1. In Home Assistant, open **Settings → Add-ons → Add-on store**
-2. Add this repository:
-   - `https://github.com/techartdev/NanoClawHomeAssistant`
-3. Install **NanoClaw Assistant**
-4. Open the **Configuration** tab before first start
+2. Open **⋮ → Repositories**
+3. Add this repository:
+   - `https://github.com/yerros/NanoClawHomeAssistant`
+4. Install **NanoClaw Assistant**
+5. Open the add-on **Configuration** tab before first start
 
-## Recommended configuration
-
-For a first boot:
+## Recommended first-boot configuration
 
 - `bootstrap_repository: true`
 - `nanoclaw_repo_url: https://github.com/qwibitai/nanoclaw.git`
@@ -54,21 +44,20 @@ For a first boot:
 
 ## First boot flow
 
-When the add-on starts, it will try to:
+On startup, the add-on tries to:
 
 1. clone NanoClaw into `/config/nanoclaw/app`
-2. run `pnpm install`
-3. run `pnpm build`
-4. start `pnpm start`
+2. install dependencies with `pnpm install`
+3. build with `pnpm build`
+4. start NanoClaw with `pnpm start`
 
-If one of those steps fails, the add-on should still keep the Ingress page and terminal alive so you can finish setup manually.
+If any of those steps fail, the add-on should still keep the Ingress page and terminal available so you can finish setup manually.
 
-Important files:
-
+Useful paths:
 - checkout: `/config/nanoclaw/app`
 - runtime log: `/config/nanoclaw/logs/nanoclaw.log`
 - bootstrap/install log: `/config/nanoclaw/logs/bootstrap.log`
-- docker daemon log: `/config/nanoclaw/logs/dockerd.log`
+- Docker daemon log: `/config/nanoclaw/logs/dockerd.log`
 
 ## Manual setup
 
@@ -79,7 +68,7 @@ cd /config/nanoclaw/app
 bash nanoclaw.sh
 ```
 
-If the checkout already exists but the upstream script is not the right path for your branch, try:
+If your upstream branch does not provide `nanoclaw.sh`, use:
 
 ```sh
 cd /config/nanoclaw/app
@@ -91,7 +80,7 @@ pnpm start
 
 ## Claude Code authentication
 
-NanoClaw depends on Claude Code for its normal workflows. The add-on installs the `claude` CLI, but you still need to authenticate it interactively from the terminal.
+NanoClaw depends on Claude Code for its normal workflows. The add-on installs the `claude` CLI, but you still need to authenticate it from the terminal.
 
 Typical flow:
 
@@ -99,34 +88,63 @@ Typical flow:
 claude
 ```
 
-## Docker requirement
+Then complete the login flow shown in the terminal.
 
-NanoClaw upstream runs agent workloads in containers. Home Assistant's `docker_api` capability is documented as read-only, so it is not sufficient for NanoClaw because NanoClaw needs to create containers.
+## Configuration reference
 
-Because of that, this add-on uses:
+`timezone`
+- Exported as `TZ` inside the add-on runtime.
 
+`enable_terminal`
+- Enables the embedded `ttyd` terminal in the Ingress page.
+
+`terminal_port`
+- Internal port used by `ttyd`.
+
+`assistant_name`
+- Exported as `ASSISTANT_NAME`.
+
+`bootstrap_repository`
+- Clones NanoClaw automatically into persistent storage if no checkout exists yet.
+
+`nanoclaw_repo_url`
+- Git URL used for the persistent checkout.
+
+`nanoclaw_repo_ref`
+- Git branch or tag used for the first clone.
+
+`auto_start_nanoclaw`
+- Starts `pnpm start` automatically when `dist/index.js` exists.
+
+`max_concurrent_containers`
+- Exported as `MAX_CONCURRENT_CONTAINERS`.
+
+`onecli_url`
+- Optional `ONECLI_URL` override.
+
+`nanoclaw_env_vars`
+- Additional environment variables passed to the NanoClaw host process.
+
+## Security model
+
+NanoClaw needs to create containers for agent workloads. Home Assistant documents `docker_api` as read-only, so this add-on cannot rely on that capability.
+
+Instead, the add-on uses:
 - `full_access: true`
 - `apparmor: false`
 - an internal `dockerd`
 
-This is the main security tradeoff of this wrapper.
-
-Relevant runtime log:
-
-```sh
-tail -n 200 /config/nanoclaw/logs/dockerd.log
-```
+This is the largest operational and security tradeoff in the project. Read [SECURITY.md](SECURITY.md) before deploying it on a trusted Home Assistant instance.
 
 ## Raspberry Pi 3 guidance
 
-NanoClaw is lighter than OpenClaw, but Raspberry Pi 3 is still constrained.
+NanoClaw is lighter than OpenClaw, but Raspberry Pi 3 is still resource-constrained.
 
-Use these settings:
-
+Recommended settings:
 - `max_concurrent_containers: 1`
-- avoid multiple channels
-- keep terminal enabled only when needed
-- expect `pnpm install` and first build to be slow
+- keep the number of active channels low
+- avoid repeated rebuilds
+- expect slow `pnpm install`, `pnpm build`, and container startup
 
 ## Troubleshooting
 
@@ -150,8 +168,16 @@ pnpm start
 
 ### Docker-related errors
 
-If NanoClaw reports it cannot start containers:
+If NanoClaw cannot start agent containers:
 
-1. confirm the add-on was installed with the current elevated privilege settings
-2. review `/config/nanoclaw/logs/dockerd.log`
-3. review NanoClaw logs for upstream container runtime errors
+1. confirm the add-on is running with the current elevated privilege settings
+2. inspect `/config/nanoclaw/logs/dockerd.log`
+3. inspect NanoClaw runtime logs for upstream container runtime failures
+
+### Claude Code setup does not complete
+
+Authenticate Claude Code first:
+
+```sh
+claude
+```

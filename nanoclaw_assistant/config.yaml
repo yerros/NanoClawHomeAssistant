@@ -2,7 +2,7 @@ name: NanoClaw Assistant
 version: "0.1.0"
 slug: nanoclaw_assistant
 description: Experimental Home Assistant add-on wrapper for NanoClaw with internal Docker runtime.
-url: https://github.com/techartdev/OpenClawHomeAssistant
+url: https://github.com/yerros/NanoClawHomeAssistant
 arch:
   - amd64
   - aarch64
