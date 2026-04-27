@@ -1,0 +1,34 @@
+configuration:
+  timezone:
+    name: Timezone
+    description: Timezone for the add-on runtime.
+  enable_terminal:
+    name: Enable Web Terminal
+    description: Enable the browser terminal inside the Home Assistant add-on page.
+  terminal_port:
+    name: Terminal Port
+    description: Internal ttyd port for the embedded web terminal.
+  assistant_name:
+    name: Assistant Name
+    description: Exported as ASSISTANT_NAME for NanoClaw.
+  bootstrap_repository:
+    name: Bootstrap Repository
+    description: Clone NanoClaw into persistent storage automatically on first start.
+  nanoclaw_repo_url:
+    name: NanoClaw Repository URL
+    description: Git repository to clone for the persistent NanoClaw checkout.
+  nanoclaw_repo_ref:
+    name: NanoClaw Repository Ref
+    description: Git branch or tag to clone on first bootstrap.
+  auto_start_nanoclaw:
+    name: Auto Start NanoClaw
+    description: Start NanoClaw automatically when the checkout is present and build artifacts exist.
+  max_concurrent_containers:
+    name: Max Concurrent Containers
+    description: Exported as MAX_CONCURRENT_CONTAINERS for NanoClaw agent sessions.
+  onecli_url:
+    name: OneCLI URL
+    description: Optional ONECLI_URL override for NanoClaw credential routing.
+  nanoclaw_env_vars:
+    name: NanoClaw Environment Variables
+    description: Extra environment variables passed to the NanoClaw host process at startup.

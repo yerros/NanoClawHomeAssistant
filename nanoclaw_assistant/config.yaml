@@ -1,0 +1,54 @@
+name: NanoClaw Assistant
+version: "0.1.0"
+slug: nanoclaw_assistant
+description: Experimental Home Assistant add-on wrapper for NanoClaw with internal Docker runtime.
+url: https://github.com/techartdev/OpenClawHomeAssistant
+arch:
+  - amd64
+  - aarch64
+  - armv7
+startup: services
+boot: manual
+init: false
+hassio_api: false
+homeassistant_api: false
+apparmor: false
+full_access: true
+
+ingress: true
+ingress_port: 48098
+panel_title: NanoClaw Assistant
+panel_icon: mdi:robot-outline
+
+map:
+  - addon_config:rw
+  - share:rw
+  - media:rw
+
+options:
+  timezone: "UTC"
+  enable_terminal: true
+  terminal_port: 7682
+  assistant_name: "Andy"
+  bootstrap_repository: true
+  nanoclaw_repo_url: "https://github.com/qwibitai/nanoclaw.git"
+  nanoclaw_repo_ref: "main"
+  auto_start_nanoclaw: true
+  max_concurrent_containers: 2
+  onecli_url: ""
+  nanoclaw_env_vars: []
+
+schema:
+  timezone: str
+  enable_terminal: bool?
+  terminal_port: int(1024,65535)?
+  assistant_name: str?
+  bootstrap_repository: bool?
+  nanoclaw_repo_url: str?
+  nanoclaw_repo_ref: str?
+  auto_start_nanoclaw: bool?
+  max_concurrent_containers: int(1,32)?
+  onecli_url: str?
+  nanoclaw_env_vars:
+    - name: "match(^[A-Z_][A-Z0-9_]*$)"
+      value: str
